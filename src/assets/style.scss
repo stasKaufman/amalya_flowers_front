@@ -1,0 +1,9 @@
+/* Set core body defaults */
+* {
+  box-sizing: border-box;
+}
+
+body {
+    font-family: Inter, BlinkMacSystemFont, "Segoe UI", roboto, Oxygen;
+    text-rendering: optimizeSpeed;
+}
