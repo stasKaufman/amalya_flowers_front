@@ -20,8 +20,8 @@
         <el-icon id="comment-icon" size="18" :color="COMMENT_ICON_COLOR" v-if="scope.row.free_text && scope.row.free_text.length > 0"><Comment /></el-icon>
       </template>
     </el-table-column>
-    <el-table-column prop="date" label="Date"/>
-    <el-table-column prop="appearance" label="Appearance">
+    <el-table-column prop="date" label="Date" min-width="46" />
+    <el-table-column prop="appearance" label="Looks" min-width="39">
         <template #default="scope">
             <el-icon v-if="scope.row.appearance === true" :size="25" :color="GREEN"><Select /></el-icon>
             <el-icon v-if="scope.row.appearance === false" :size="25" :color="RED"><CloseBold /></el-icon>
@@ -65,6 +65,9 @@ export default {
     cellStyle ({ columnIndex }) {
       if (columnIndex === 4) {
         return { 'text-align': 'right' }
+      }
+      if (columnIndex === 3) {
+        return { 'text-align': 'center' }
       }
     },
     setConstants () {
