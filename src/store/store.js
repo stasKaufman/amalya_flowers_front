@@ -56,8 +56,7 @@ export default createStore({
       }
     },
     async createOrUpdateFlowerTracker (_, payload) {
-      const { flower_Id, date, appearance } = payload
-      await axios.post('/flower/tracker', { flower_Id, date, appearance })
+      await axios.post('/flower/tracker', payload)
       return Promise.resolve()
     }
   }

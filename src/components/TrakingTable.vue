@@ -1,6 +1,26 @@
 <template>
-  <el-table :cell-style="cellStyle" id="tracking-table" :data="adjustedTrackerList">
-    <el-table-column prop="date" label="Date" />
+  <el-table
+  :row-key="row => row.date"
+  :cell-style="cellStyle"
+  id="tracking-table"
+  :data="adjustedTrackerList">
+    <el-table-column prop="free_text" type="expand">
+      <template #default="scope">
+        <el-input
+          :modelValue="scope.row.free_text"
+          @update:modelValue="updateText($event, scope.$index)"
+          :rows="2"
+          type="textarea"
+          placeholder="Please input"
+        />
+      </template>
+    </el-table-column>
+    <el-table-column min-width="15">
+      <template #default="scope">
+        <el-icon id="comment-icon" size="18" :color="COMMENT_ICON_COLOR" v-if="scope.row.free_text && scope.row.free_text.length > 0"><Comment /></el-icon>
+      </template>
+    </el-table-column>
+    <el-table-column prop="date" label="Date"/>
     <el-table-column prop="appearance" label="Appearance">
         <template #default="scope">
             <el-icon v-if="scope.row.appearance === true" :size="25" :color="GREEN"><Select /></el-icon>
@@ -9,14 +29,15 @@
     </el-table-column>
     <el-table-column>
       <template #default="scope">
-        <el-button :disabled="!isAdmin"  type="success" @click.prevent="changeStatus(scope.$index, true)" circle><el-icon><Select /></el-icon></el-button>
-        <el-button :disabled="!isAdmin" type="danger" @click.prevent="changeStatus(scope.$index, false)" circle><el-icon><Delete /></el-icon></el-button>
+        <el-button :disabled="!isAdmin"  type="success" @click.prevent="updateStatus(scope.$index, true)" circle><el-icon><Select /></el-icon></el-button>
+        <el-button :disabled="!isAdmin" type="danger" @click.prevent="updateStatus(scope.$index, false)" circle><el-icon><Close /></el-icon></el-button>
       </template>
     </el-table-column>
   </el-table>
 </template>
 <script>
-import { GREEN, RED } from '../helpers/constants'
+import { GREEN, RED, COMMENT_ICON_COLOR } from '../helpers/constants'
+import { debounce } from 'debounce'
 export default {
   props: {
     flowerId: {
@@ -35,32 +56,49 @@ export default {
   name: 'TrakingTable',
   created () {
     this.setConstants()
+    this.debounceCreateOrUpdate = debounce(this.createOrUpdateFlowerTracker, 800)
   },
   mounted () {
     this.setAdjustedTrackerList()
   },
   methods: {
     cellStyle ({ columnIndex }) {
-      if (columnIndex === 2) {
+      if (columnIndex === 4) {
         return { 'text-align': 'right' }
       }
     },
     setConstants () {
       this.RED = RED
       this.GREEN = GREEN
+      this.COMMENT_ICON_COLOR = COMMENT_ICON_COLOR
     },
-    async changeStatus (index, status) {
-      // optimistic update
+    async createOrUpdateFlowerTracker (payload, index) {
+      payload.flower_Id = this.flowerId
+      payload.date = this.adjustedTrackerList[index].date
       const currentAppearance = this.adjustedTrackerList[index].appearance
-      this.adjustedTrackerList[index].appearance = status
-      // get data and send to the server
-      const payload = { flower_Id: this.flowerId, date: this.adjustedTrackerList[index].date, appearance: status }
+      const currentText = this.adjustedTrackerList[index].free_text
       try {
         await this.$store.dispatch('createOrUpdateFlowerTracker', payload)
       } catch (error) {
         // rollback in case error happened.
         this.adjustedTrackerList[index].appearance = currentAppearance
+        this.adjustedTrackerList[index].free_text = currentText
       }
+    },
+    updateText (text, index) {
+      // // optimistic update
+      this.adjustedTrackerList[index].free_text = text
+      const payload = {
+        free_text: text
+      }
+      this.debounceCreateOrUpdate(payload, index)
+    },
+    updateStatus (index, status) {
+      // optimistic update
+      this.adjustedTrackerList[index].appearance = status
+      // get data and send to the server
+      const payload = { appearance: status }
+      this.debounceCreateOrUpdate(payload, index)
     },
     setAdjustedTrackerList () {
       const setTracker = new Set()
@@ -98,6 +136,11 @@ export default {
 
   #tracking-table {
     width: 46%
+  }
+
+  #comment-icon {
+    margin-top: 10px;
+    margin-left: -10px;
   }
 
   @media only screen and (max-width: 820px) {
