@@ -18,7 +18,7 @@
               <el-divider v-if="flower.name" direction="vertical" />
               <span v-if="flower.name">{{flower.name}}</span>
               <el-divider v-if="flower.old_id" direction="vertical" />
-              <span v-if="flower.name">{{flower.old_id}}</span>
+              <span v-if="flower.old_id">{{flower.old_id}}</span>
             </div>
         </el-card>
     </div>
