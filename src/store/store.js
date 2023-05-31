@@ -38,6 +38,13 @@ export default createStore({
         console.error(error)
       }
     },
+    async updateFlower ({ commit }, payload) {
+      try {
+        await axios.post('/flower/update/' + payload.id, payload)
+      } catch (error) {
+        console.error(error)
+      }
+    },
     async getFlower (_, payload) {
       try {
         const { data } = await axios.get('/flower/' + payload.id)
@@ -48,8 +55,8 @@ export default createStore({
     },
     async getFlowers (_, payload) {
       try {
-        const { limit, text, offset } = payload
-        const { data } = await axios.post('/flower/search', { offset, limit, text })
+        const { limit, text, offset, activityStatus } = payload
+        const { data } = await axios.post('/flower/search', { offset, limit, text, activityStatus })
         return data
       } catch (error) {
         console.error(error)

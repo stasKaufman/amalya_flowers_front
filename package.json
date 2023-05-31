@@ -5,14 +5,15 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "start": "vue-cli-service serve"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.0.10",
     "axios": "^1.2.1",
     "core-js": "^3.8.3",
     "debounce": "^1.2.1",
-    "element-plus": "^2.2.26",
+    "element-plus": "^2.3.5",
     "vue": "^3.2.13",
     "vue-router": "^4.0.3",
     "vuex": "^4.0.0"

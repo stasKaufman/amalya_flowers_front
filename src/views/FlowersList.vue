@@ -1,7 +1,14 @@
 <template>
     <div v-loading="loading">
-      <el-input :suffix-icon="Search" clearable v-model="text" class="search-input" placeholder="Search flower" />
-      <el-button @click="search"  class="search-button" type="primary">Search</el-button>
+      <div class="flower-menu">
+        <el-input :suffix-icon="Search" clearable v-model="text" class="search-input" placeholder="Search flower" />
+        <el-button @click="search"  class="search-button" type="primary">Search</el-button>
+        <el-divider direction="vertical" />
+        <el-checkbox-group v-model="activeInactive">
+          <el-checkbox label="Active" />
+          <el-checkbox label="Inactive" />
+        </el-checkbox-group>
+      </div>
       <div v-if="flowers.length" id="flowers-grid">
         <FlowerCard @click="goToFlowerPage(flower.id)" class="flower-card"
         :flower="flower" v-for="flower in flowers" :key="flower.id"></FlowerCard>
@@ -23,9 +30,12 @@
     </div>
 </template>
 <script>
-
 import FlowerCard from '../components/flowerCard.vue'
 import { CARD_ON_PAGE_LIMIT } from '../helpers/constants'
+const ACTIVE_INACTIVE_MAP = {
+  Active: true,
+  Inactive: false
+}
 export default {
   name: 'FlowerList',
   components: {
@@ -37,7 +47,8 @@ export default {
       text: '',
       currentPage: 1,
       flowers: [],
-      loading: false
+      loading: false,
+      activeInactive: []
     }
   },
   mounted () {
@@ -70,7 +81,9 @@ export default {
     async fetchFlowers () {
       this.loading = true
       const offset = (this.currentPage - 1) * CARD_ON_PAGE_LIMIT
-      const { flowers, total } = await this.$store.dispatch('getFlowers', { text: this.text, limit: CARD_ON_PAGE_LIMIT, offset })
+      const activityStatus = this.activeInactive.length === 2 || this.activeInactive.length === 0 ? null : ACTIVE_INACTIVE_MAP[this.activeInactive[0]]
+      const { flowers, total } = await this.$store.dispatch('getFlowers',
+        { text: this.text, limit: CARD_ON_PAGE_LIMIT, offset, activityStatus })
       this.flowers = flowers
       this.total = total
       this.loading = false
@@ -79,6 +92,9 @@ export default {
   watch: {
     async $route (to, from) {
       this.currentPage = +to.query.page
+      await this.fetchFlowers()
+    },
+    async activeInactive () {
       await this.fetchFlowers()
     }
   }
@@ -102,22 +118,6 @@ export default {
   margin-left: 30px;
 }
 
-// not working
-@media only screen and (max-width: 600px) {
-  :deep(.search-input), :deep(.search-button)  {
-      width: 100%;
-      display: inline-flex;
-    }
-
-  :deep(.search-button) {
-    margin-top: 8px;
-  }
-
-  :deep(.search-input) {
-    margin-left: 0
-  }
-}
-
 #flowers-grid {
   column-width: 320px;
   column-gap: 20px;
@@ -135,5 +135,45 @@ export default {
   display: inline-block;
   max-width: 320px;
   cursor: pointer;
+}
+
+.flower-menu {
+  display: flex;
+}
+
+.el-divider--vertical {
+  height: 2rem;
+  margin: 0 16px;
+}
+
+// not working
+@media only screen and (max-width: 600px) {
+  .flower-menu {
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .el-checkbox-group {
+    display: flex;
+    justify-content: center;
+    margin-top: 8px;
+  }
+
+  .el-divider--vertical {
+    display: none;
+  }
+
+  :deep(.search-input), :deep(.search-button)  {
+      width: 100%;
+      display: inline-flex;
+    }
+
+  :deep(.search-button) {
+    margin-top: 8px;
+  }
+
+  :deep(.search-input) {
+    margin-left: 0
+  }
 }
 </style>

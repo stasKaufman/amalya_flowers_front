@@ -1,5 +1,5 @@
 <template>
-  <el-table
+    <el-table
   :row-key="row => row.date"
   :cell-style="cellStyle"
   id="tracking-table"
@@ -7,6 +7,7 @@
     <el-table-column prop="free_text" type="expand">
       <template #default="scope">
         <el-input
+          :disabled="!isFlowerActive"
           :modelValue="scope.row.free_text"
           @update:modelValue="updateText($event, scope.$index)"
           :rows="2"
@@ -29,8 +30,8 @@
     </el-table-column>
     <el-table-column>
       <template #default="scope">
-        <el-button :disabled="!isAdmin"  type="success" @click.prevent="updateStatus(scope.$index, true)" circle><el-icon><Select /></el-icon></el-button>
-        <el-button :disabled="!isAdmin" type="danger" @click.prevent="updateStatus(scope.$index, false)" circle><el-icon><Close /></el-icon></el-button>
+        <el-button :disabled="!isAdmin || !isFlowerActive"  type="success" @click.prevent="updateStatus(scope.$index, true)" circle><el-icon><Select /></el-icon></el-button>
+        <el-button :disabled="!isAdmin || !isFlowerActive" type="danger" @click.prevent="updateStatus(scope.$index, false)" circle><el-icon><Close /></el-icon></el-button>
       </template>
     </el-table-column>
   </el-table>
@@ -46,6 +47,10 @@ export default {
     flowerTracker: {
       type: Array,
       default: () => []
+    },
+    isFlowerActive: {
+      type: Boolean,
+      default: true
     }
   },
   data () {
@@ -89,7 +94,7 @@ export default {
       }
     },
     updateText (text, index) {
-      // // optimistic update
+      // optimistic update
       this.adjustedTrackerList[index].free_text = text
       const payload = {
         free_text: text
@@ -138,7 +143,8 @@ export default {
 <style scoped lang="scss">
 
   #tracking-table {
-    width: 46%
+    // width: 46%;
+    display: inline-block;
   }
 
   #comment-icon {
