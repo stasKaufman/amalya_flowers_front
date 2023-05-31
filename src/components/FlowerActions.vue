@@ -2,7 +2,7 @@
     <el-row :gutter="20">
       <el-col :sm="24" :lg="11">
         <el-card>
-          <el-button :disabled="!isFlowerActive" type="danger" @click="dialogVisible = true" :icon="Delete">deactivate</el-button>
+          <el-button :disabled="!isFlowerActive || !isAdmin" type="danger" @click="dialogVisible = true" :icon="Delete">deactivate (לפסול)</el-button>
         </el-card>
       </el-col>
       <el-col :sm="24" :lg="13">
@@ -14,10 +14,10 @@
     <el-dialog
       v-model="dialogVisible"
       width="30%"
-      title="Please choose a reason for deactivation">
+      title="Please choose a reason for deactivation (בחר סיבה לפסילה)">
       <el-checkbox-group v-model="checkList">
-        <el-checkbox label="lack of demand" />
-        <el-checkbox label="issues with growth" />
+        <el-checkbox label="lack of demand (חוסר ביקוש)" />
+        <el-checkbox label="issues with growth (בעיה בגדילה)" />
       </el-checkbox-group>
       <template #footer>
         <span class="dialog-footer">
@@ -60,6 +60,9 @@ export default {
         return this.flower.is_active
       }
       return false
+    },
+    isAdmin () {
+      return +localStorage.getItem('role') === 200
     }
   },
   methods: {
