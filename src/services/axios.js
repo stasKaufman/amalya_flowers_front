@@ -3,7 +3,7 @@ import router from '../router/router'
 import { isTokenValid } from '../helpers/axiosHelper'
 // axios.defaults.baseURL = 'http://localhost:3000/api'
 // // process.env
-axios.defaults.baseURL = 'http://amalyaflowers-env.eba-39fcp8ra.us-east-1.elasticbeanstalk.com/api'
+axios.defaults.baseURL = 'ec2-3-88-222-81.compute-1.amazonaws.com/api'
 axios.interceptors.request.use(config => {
   if (config.url !== '/login') {
     if (isTokenValid()) {
